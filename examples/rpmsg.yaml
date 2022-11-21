@@ -1,0 +1,21 @@
+---
+pdo_a2r_servos:
+  servo_num: 3
+
+pdo_a2r_servo:
+  contents:
+    - name: control_word
+      data_type: uint16_t
+    - name: target_position
+      data_type: int32_t
+    - name: mode_of_operation
+      data_type: int8_t
+    
+pdo_a2r:
+  contents:
+    - name: servos
+      data_type: pdo_a2r_servos
+    - name: do
+      data_type: uint16_t
+
+

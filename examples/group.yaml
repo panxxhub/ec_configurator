@@ -1,3 +1,0 @@
-groups:
-  - name: "tri_axis"
-    slaves: [0, 1, 2, 3]

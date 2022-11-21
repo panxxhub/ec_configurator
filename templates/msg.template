@@ -1,0 +1,86 @@
+#pragma once
+
+#include <array>
+#if defined(__cplusplus)
+#include <cstdint>
+namespace icnc_rpc_controller {
+#endif
+
+#ifndef AXES_NUM
+#define AXES_NUM 6
+#endif
+
+#ifndef IO_NUM
+#define IO_NUM 2
+#endif
+
+#ifdef __GNUC__
+#pragma pack(push, 1)
+#endif
+
+// use domain to simulate data exchange later
+
+/**
+ * @brief PDO for process data object, SDO for service data object
+ *
+ */
+struct pdo_a2r_servo {
+  int16_t control_word;
+  int32_t target_position;
+#if defined(MAP_VELOCITY_PDO)
+  int32_t target_velocity;
+#endif
+  int8_t mode_operation;
+};
+
+struct pdo_r2a_servo {
+  uint16_t status_word;
+  int32_t actual_position;
+#if defined(MAP_VELOCITY_PDO)
+  int32_t actual_velocity;
+#endif
+  int8_t mode_of_operation_display;
+};
+
+using pdo_a2r_servos = std::array<pdo_a2r_servo, AXES_NUM>;
+struct pdo_a2r {
+  pdo_a2r_servos servos;
+  uint16_t digital_output;
+};
+
+using pdo_r2a_servos = std::array<pdo_r2a_servo, AXES_NUM>;
+
+struct pdo_r2a {
+  pdo_r2a_servos servos;
+  uint16_t digital_input;
+};
+
+struct a2r {
+  uint16_t domain_idx;
+  uint16_t pkg_num;
+  struct pdo_a2r data[4];
+} __attribute__((aligned(0x20)));
+
+struct r2a {
+  uint16_t buffer_len;
+  uint16_t domain_idx;
+  uint64_t cycle_count;
+  struct pdo_r2a data;
+} __attribute__((aligned(0x20)));
+
+struct sdo_a2r {
+  int32_t reserved;
+};
+struct sdo_r2a {
+  int32_t reserved;
+};
+
+#ifdef __GNUC__
+#pragma pack(pop)
+#endif
+
+#if defined(__cplusplus)
+
+}  // namespace icnc_rpc_controller
+
+#endif	

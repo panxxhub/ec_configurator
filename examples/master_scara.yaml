@@ -1,5 +1,4 @@
-group_num: 1
-rpmsg_buffer_size: 0x200
+rpmsg_buffer_size: 0x800
 debug: true
 slaves:
   - index: 0
@@ -34,7 +33,7 @@ slaves:
     config_pdo: true
     group_index: 0
     esi_file: /home/pan/ANCC/config_generator/slave_settings/panasonic_minas-a6be_v1_9 csp.xml
-  - index: 4
+ - index: 4
     vendor_id: 0x0A09
     product_code: 0x2200
     type: 0
