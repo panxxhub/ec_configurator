@@ -1,0 +1,77 @@
+DEFINE_KFIFO(rpmsg_kfifo, rpmsg_pkg_t, 64);
+static uint16_t used_idx = 0;
+
+void rpmsg_kfifo_put(rpmsg_pkg_t pkg) { kfifo_put(&rpmsg_kfifo, pkg); }
+
+void rpmsg_kfifo_peek(rpmsg_pkg_t* pkg) { kfifo_peek(&rpmsg_kfifo, pkg); }
+
+void rpmsg_kfifo_get(rpmsg_pkg_t* pkg) { kfifo_get(&rpmsg_kfifo, pkg); }
+
+int rpmsg_pdo_get(pdo_a2r_t** pdo) {
+    rpmsg_pkg_t pkg = {.rpmsg_buffer = NULL};
+
+    if (kfifo_is_empty(&rpmsg_kfifo)) {
+        *pdo     = NULL;
+        used_idx = 0;
+        return 0;
+    }
+
+    kfifo_peek(&rpmsg_kfifo, &pkg);
+    a2r_t* a2r_ptr = (a2r_t*)pkg.rpmsg_buffer;
+    *pdo           = (pdo_a2r_t*)(&(a2r_ptr)->data[used_idx]);
+
+    used_idx++;
+    if (used_idx == a2r_ptr->pkg_num) {
+        kfifo_get(&rpmsg_kfifo, &pkg); // remove the pkg from kfifo
+        rpmsg_release_rx_buffer(pdo_channel, pkg.rpmsg_buffer);
+        used_idx = 0;
+    }
+    return kfifo_len(&rpmsg_kfifo);
+}
+
+int rpmsg_pdo_peek(pdo_a2r_t** pdo) {
+    rpmsg_pkg_t pkg = {.rpmsg_buffer = NULL};
+
+    if (kfifo_is_empty(&rpmsg_kfifo)) {
+        *pdo     = NULL;
+        used_idx = 0;
+        return 0;
+    }
+
+    kfifo_peek(&rpmsg_kfifo, &pkg);
+    a2r_t* a2r_ptr = (a2r_t*)pkg.rpmsg_buffer;
+    *pdo           = (pdo_a2r_t*)(&(a2r_ptr)->data[used_idx]);
+
+    return kfifo_len(&rpmsg_kfifo);
+}
+
+int rpmsg_pdo_get_keep_last(pdo_a2r_t** pdo) {
+    rpmsg_pkg_t pkg = {
+        .rpmsg_buffer = NULL,
+    };
+    int fifo_len = 0;
+
+    if (kfifo_is_empty(&rpmsg_kfifo)) {
+        *pdo     = NULL;
+        used_idx = 0;
+        return 0;
+    }
+
+    kfifo_peek(&rpmsg_kfifo, &pkg);
+    a2r_t* a2r_ptr = (a2r_t*)pkg.rpmsg_buffer;
+    *pdo           = (pdo_a2r_t*)(&(a2r_ptr)->data[used_idx]);
+    used_idx++;
+
+    if (used_idx == a2r_ptr->pkg_num) {
+        fifo_len = kfifo_len(&rpmsg_kfifo);
+        if (fifo_len > 1) {
+            kfifo_get(&rpmsg_kfifo, &pkg); // remove the pkg from kfifo
+            rpmsg_release_rx_buffer(pdo_channel, pkg.rpmsg_buffer);
+            used_idx = 0;
+            fifo_len--;
+        } else {
+            used_idx--;
+        }
+    }
+    return fifo_len;
+}

@@ -1,0 +1,27 @@
+rpmsg_buffer_size: 0x800
+debug: true
+slaves:
+  - vendor_id: 0x01DD
+    product_code: 0x6080
+    type: 1
+    dc_enable: true
+    config_pdo: true
+    esi_file: /home/pan/ANCC/config_generator/slave_settings/Delta ASDA-x3-E csp.xml
+  - vendor_id: 0x01DD
+    product_code: 0x6080
+    type: 1
+    dc_enable: true
+    config_pdo: true
+    esi_file: /home/pan/ANCC/config_generator/slave_settings/Delta ASDA-x3-E csp.xml
+  - vendor_id: 0x01DD
+    product_code: 0x6080
+    type: 1
+    dc_enable: true
+    config_pdo: true
+    esi_file: /home/pan/ANCC/config_generator/slave_settings/Delta ASDA-x3-E csp.xml
+  - vendor_id: 0x0A09
+    product_code: 0x2200
+    type: 0
+    dc_enable: false
+    config_pdo: true
+    esi_file: /home/pan/ANCC/config_generator/slave_settings/iTegva ECAT-DIO-XX Series_V1.2.xml
